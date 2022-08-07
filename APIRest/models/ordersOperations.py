@@ -36,6 +36,9 @@ class ordersOperations:
         conn = databaseConnector.get_db_connection()
         productsTotal = {}
 
+
+        #Adds all the products in a dictionary, this is because in the example the user can asks for 
+        #more products with the same sku
         for product in products:
             if product['sku'] in productsTotal:
                 productsTotal[product['sku']] += product['amount']
@@ -45,11 +48,13 @@ class ordersOperations:
         for product in productsTotal:
             rowProductsStock = conn.execute('SELECT Stock FROM Products WHERE sku=?',(product,)).fetchone()
             
+            #Reviews if the sku actually exists
             if rowProductsStock is None:
                 return "The sku "+str(product)+" doesn't exist"
 
             productsStock= rowProductsStock["Stock"]
 
+            #if there's no enough stock, will return an error
             if productsStock < productsTotal[product]:
                 return "Error, there's no enough stock"
 
@@ -58,6 +63,7 @@ class ordersOperations:
 
         createdDate = datetime.now()
         
+        #creates the order table record to get the order id
         conn.execute('INSERT INTO Orders(CreatedDate, StatusOrdersID) VALUES (?,?)', (createdDate, statusOrdersID))
         
         conn.commit()
@@ -65,6 +71,7 @@ class ordersOperations:
         rowOrdersID = conn.execute('SELECT MAX(OrdersID) AS OrdersID FROM Orders').fetchone()
         ordersID= rowOrdersID['OrdersID']
 
+        #inserts the products and the order id into the table many to many
         for product in products:
             rowProductsID = conn.execute('SELECT productsID FROM Products WHERE sku = ?',(product['sku'],)).fetchone()
             productsID = rowProductsID['productsID']
