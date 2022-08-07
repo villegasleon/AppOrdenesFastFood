@@ -28,7 +28,7 @@ flask --app iaExam run
 
 ### How to run FrontEnd
 - Download the repository
-- In CMD, locate yourself in the "Website\reactiaexam" folder
+- In CMD, locate yourself in the "website" folder
 - Run the application:
 ```
 npm start
